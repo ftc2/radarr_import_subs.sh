@@ -21,11 +21,11 @@
 #########################
 # Setup
 
-release_grps=('RARBG' 'VXT') # only process these groups' releases
-sub_dirs=('Subs' 'Subtitles') # paths to search for subtitles; use () to search all subdirectories
-sub_exts='srt\|ass' # subtitle file extensions separated by \|
-sub_regex=".*en.*\.\(${sub_exts}\)$" # regex used to find subtitles (in this POS regex variant, you have to escape ())
-sub_lang='en' # this just gets added to final subtitle filenames
+RELEASE_GRPS=('RARBG' 'VXT') # only process these groups' releases
+SUB_DIRS=('Subs' 'Subtitles') # paths to search for subtitles; use () to search all subdirectories
+SUB_EXTS='srt\|ass' # subtitle file extensions separated by \|
+SUB_REGEX=".*en.*\.\(${SUB_EXTS}\)$" # regex used to find subtitles (in this POS regex variant, you have to escape ())
+SUB_LANG='en' # this just gets added to final subtitle filenames
 LOGGING=''
   #      '': standard logging
   # 'debug': log all messages to stderr to make them visible as Info in radarr logs
@@ -75,7 +75,7 @@ fi
 [[ "$radarr_eventtype" != 'Download' ]] && exit 0
 
 # check release group
-printf '%s\0' "${release_grps[@]}" | grep -F -x -z -- "$radarr_moviefile_releasegroup" >/dev/null || exit 0
+printf '%s\0' "${RELEASE_GRPS[@]}" | grep -F -x -z -- "$radarr_moviefile_releasegroup" >/dev/null || exit 0
 
 dlog '----------Subdirectory Subtitle Importer----------'
 [[ "$LOGGING" == 'trace' ]] && log "$(printenv)"
@@ -83,15 +83,15 @@ dlog '----------Subdirectory Subtitle Importer----------'
 # full target path for sub files (without file extension)
 sub_path_prefix="${radarr_moviefile_path%.*}"
 
-for rel_sub_dir in "${sub_dirs[@]}"; do
+for rel_sub_dir in "${SUB_DIRS[@]}"; do
   dlog "Current subtitle dir: ${rel_sub_dir}"
   sub_dir="${radarr_moviefile_sourcefolder}/${rel_sub_dir}"
   if [[ -d "$sub_dir" ]]; then
     # path exists
     cd "$sub_dir" # `find` searches entire path, so `cd` to get relative path instead!
-    num_subs=$(find . -type f -iregex "$sub_regex" -printf '.' | wc -c)
+    num_subs=$(find . -type f -iregex "$SUB_REGEX" -printf '.' | wc -c)
     dlog "Found ${num_subs} matching subtitle(s) in ${sub_dir}"
-    find . -type f -iregex "$sub_regex" -print0 |
+    find . -type f -iregex "$SUB_REGEX" -print0 |
       while read -r -d '' sub_file; do
         dlog "Current subtitle: ${sub_file}"
         sub_ext="${sub_file##*.}"
@@ -101,15 +101,15 @@ for rel_sub_dir in "${sub_dirs[@]}"; do
           # if there's only one sub file but it has a funny track number, just assume it's a normal sub (track 2)
           [[ "$num_subs" -eq 1 && "$sub_track_num" -gt 3 ]] && sub_track_num=2
           case "$sub_track_num" in
-            1) sub_track="${sub_lang}.forced";;
-            2) sub_track="${sub_lang}";;
-            3) sub_track="${sub_lang}.sdh";;
-            *) sub_track="${sub_lang}.${sub_track_num}";;
+            1) sub_track="${SUB_LANG}.forced";;
+            2) sub_track="${SUB_LANG}";;
+            3) sub_track="${SUB_LANG}.sdh";;
+            *) sub_track="${SUB_LANG}.${sub_track_num}";;
           esac
         else
           if [[ "$num_subs" -eq 1 ]]; then
             # no track number, only one sub
-            sub_track="$sub_lang"
+            sub_track="$SUB_LANG"
           else
             # no track number, multiple subs
             log "ERROR: Multiple matching subtitles were found, but a match was found without a track number in its filename. Aborting. (${sub_dir}/${sub_file##*/})"
