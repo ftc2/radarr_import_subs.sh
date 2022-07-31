@@ -28,7 +28,7 @@ Suggestions and PRs welcome.
 # Setup
 
 RELEASE_GRPS=('RARBG' 'VXT') # only process these groups' releases
-SUB_DIRS=('Subs' 'Subtitles') # paths to search for subtitles; use () to search all subdirectories
+SUB_DIRS=('Subs' 'Subtitles') # paths to search for subtitles
 SUB_EXTS='srt\|ass' # subtitle file extensions separated by \|
 SUB_REGEX=".*en.*\.\(${SUB_EXTS}\)$" # regex used to find subtitles (in this POS regex variant, you have to escape ())
 SUB_LANG='en' # this just gets added to final subtitle filenames
