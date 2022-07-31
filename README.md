@@ -27,11 +27,11 @@ Suggestions and PRs welcome.
 #########################
 # Setup
 
-release_grps=('RARBG' 'VXT') # only process these groups' releases
-sub_dirs=('Subs' 'Subtitles') # paths to search for subtitles; use () to search all subdirectories
-sub_exts='srt\|ass' # subtitle file extensions separated by \|
-sub_regex=".*en.*\.\(${sub_exts}\)$" # regex used to find subtitles (in this POS regex variant, you have to escape ())
-sub_lang='en' # this just gets added to final subtitle filenames
+RELEASE_GRPS=('RARBG' 'VXT') # only process these groups' releases
+SUB_DIRS=('Subs' 'Subtitles') # paths to search for subtitles; use () to search all subdirectories
+SUB_EXTS='srt\|ass' # subtitle file extensions separated by \|
+SUB_REGEX=".*en.*\.\(${SUB_EXTS}\)$" # regex used to find subtitles (in this POS regex variant, you have to escape ())
+SUB_LANG='en' # this just gets added to final subtitle filenames
 LOGGING=''
   #      '': standard logging
   # 'debug': log all messages to stderr to make them visible as Info in radarr logs
