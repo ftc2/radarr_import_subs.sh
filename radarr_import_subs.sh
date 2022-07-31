@@ -13,14 +13,21 @@
 # 1) put this script somewhere that radarr can access
 # 2) make it executable
 #      chmod +x /path/to/radarr_import_subs.sh
-# 3) Radarr WebUI > Settings > Connect > Add (+) > Custom Script
-#      Name: Subdirectory Subtitle Importer
-#      Triggers: On Import, On Upgrade
-#      Path: /path/to/radarr_import_subs.sh
+# 3) add your radarr API info in the Setup section of this script to trigger rescan after import
+#      RADARR_URL, RADARR_API_KEY
+# 4) add this script to radarr as a custom connection
+#      Radarr WebUI > Settings > Connect > Add (+) > Custom Script
+#        Name: Subdirectory Subtitle Importer
+#        Triggers: On Import, On Upgrade
+#        Path: /path/to/radarr_import_subs.sh
 
 #########################
 # Setup
 
+RADARR_URL='http://radarr:7878' # including port (and base path if applicable)
+  # no trailing slash!
+  # example with base path: 'http://192.168.33.112:7878/basepath'
+RADARR_API_KEY='' # Radarr WebUI > Settings > General > Security
 RELEASE_GRPS=('RARBG' 'VXT') # only process these groups' releases
 SUB_DIRS=('Subs' 'Subtitles') # paths to search for subtitles
 SUB_EXTS='srt\|ass' # subtitle file extensions separated by \|
@@ -46,6 +53,9 @@ dlog() {
     echo "$1"
   fi
 }
+tlog() {
+  [[ "$LOGGING" == 'trace' ]] && log "Trace: ${1}"
+}
 
 #########################
 # Test/Debug
@@ -64,6 +74,9 @@ if [[ "$radarr_eventtype" == 'Test' ]]; then
   radarr_movie_path='/pirate/movies/Final Fantasy VII - Advent Children (2005)'
   radarr_moviefile_path='/pirate/movies/Final Fantasy VII - Advent Children (2005)/Final.Fantasy.VII.Advent.Children.Complete.2005.JAPANESE.1080p.BluRay.H264.AAC-VXT.mp4'
   radarr_moviefile_relativepath='Final.Fantasy.VII.Advent.Children.Complete.2005.JAPANESE.1080p.BluRay.H264.AAC-VXT.mp4'
+  radarr_movie_id='1591'
+  radarr_movie_title='Final Fantasy VII: Advent Children'
+  radarr_movie_year='2005'
 fi
 # after that, you can just hit the Test button on the Edit Connection dialog in radarr
 # alternatively, you can run this script from a shell by setting the event type to Test above
@@ -77,8 +90,26 @@ fi
 # check release group
 printf '%s\0' "${RELEASE_GRPS[@]}" | grep -F -x -z -- "$radarr_moviefile_releasegroup" >/dev/null || exit 0
 
+radarr_rescan() {
+  local api_url="${RADARR_URL}/api/v3/command?apikey=${RADARR_API_KEY}"
+  log "Triggering radarr rescan of ${radarr_movie_title} (${radarr_movie_year})..."
+  local response=$(curl \
+    --silent \
+    -X POST \
+    -d "{\"name\": \"RescanMovie\", \"movieId\": ${radarr_movie_id}}" \
+    -H 'Content-Type: application/json' \
+    "$api_url")
+  tlog "$response"
+  if command -v jq; then
+    # `jq` is installed
+    local status=$(echo "$response" | jq '.body | .completionMessage')
+    tlog "Rescan API request status: ${status}"
+    [[ "$status" == '"Completed"' ]] || log "ERROR: Failed to trigger rescan in radarr. Check script API settings."
+  fi
+}
+
 dlog '----------Subdirectory Subtitle Importer----------'
-[[ "$LOGGING" == 'trace' ]] && log "$(printenv)"
+tlog "$(printenv)"
 
 # full target path for sub files (without file extension)
 sub_path_prefix="${radarr_moviefile_path%.*}"
@@ -113,6 +144,7 @@ for rel_sub_dir in "${SUB_DIRS[@]}"; do
           else
             # no track number, multiple subs
             log "ERROR: Multiple matching subtitles were found, but a match was found without a track number in its filename. Aborting. (${sub_dir}/${sub_file##*/})"
+            radarr_rescan
             exit 1
           fi
         fi
@@ -121,3 +153,5 @@ for rel_sub_dir in "${SUB_DIRS[@]}"; do
       done
   fi
 done
+
+radarr_rescan
