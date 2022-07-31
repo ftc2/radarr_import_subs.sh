@@ -1,9 +1,9 @@
 # radarr_import_subs.sh
-Radarr script to import subtitles from subdirectories (subfolders)
+This is a script for Radarr to import subtitles from subdirectories (subfolders).
 
 This copies english subtitles, but it can be easily modified for another language (see SETUP section of the script).
 
-It renames subtitles according to track number in filename if present.
+It names subtitles according to track number in filename if present.
 Examples:
 - `1_English.srt` -> `movie.en.forced.srt`
 - `2_English.srt` -> `movie.en.srt`
