@@ -12,7 +12,7 @@ Examples:
 
 Suggestions and PRs welcome.
 
-```
+```bash
 #########################
 # Installation
 
