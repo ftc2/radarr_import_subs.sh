@@ -104,7 +104,7 @@ radarr_rescan() {
     # `jq` is installed
     local status=$(echo "$response" | jq '.body | .completionMessage')
     tlog "Rescan API request status: ${status}"
-    [[ "$status" == '"Completed"' ]] || log "ERROR: Failed to trigger rescan in radarr. Check script API settings."
+    [[ "$status" == '"Completed"' ]] || log 'ERROR: Failed to trigger rescan in radarr. Check script API settings.'
   fi
 }
 
