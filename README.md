@@ -8,10 +8,13 @@ Examples:
 - `1_English.srt` -> `movie.en.forced.srt`
 - `2_English.srt` -> `movie.en.srt`
 - `3_English.srt` -> `movie.en.sdh.srt`
-- ...
-- `9_English.srt` -> `movie.en.9.srt` (unknown track number)
+- `4_English.srt` -> `movie.en.4.srt` (_unknown_ track number preserved in filename)
+
+Track numbers above 3 are considered _unknown_. _Unknown_ track numbers are generally perserved in the filenames for the user's convenience. **Exception:** If only one suitable subs file is found, it is assumed to be track 2 if it has an _unknown_ track number. A subs file without a track number is also assumed to be track 2.
 
 This script depends on `bash`, `find` (with `-regex` and `-printf` support), and `curl`. `jq` is optional but used to verify successful connection to Radarr API; it's not needed to actually trigger a rescan.
+
+This script has been tested with [hotio's radarr docker image](https://hotio.dev/containers/radarr/). I suggest using it for compatibility. linuxserver.io's image is incompatible because it uses old/limited versions of basic utils. If you're having problems in another environment, I'll try to help you out, but I make no promises.
 
 Suggestions and PRs welcome.
 
