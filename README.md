@@ -5,9 +5,9 @@ This copies english subtitles, but it can be easily modified for another languag
 
 Subtitles are named according to track numbers in filenames if present.
 Examples:
-- `1_English.srt` -> `movie.en.forced.srt`
-- `2_English.srt` -> `movie.en.srt`
-- `3_English.srt` -> `movie.en.sdh.srt`
+- `1_English.srt` -> `movie.en.forced.srt` (contains subs only for non-english portions of mixed-laguage movie)
+- `2_English.srt` -> `movie.en.srt` (normal)
+- `3_English.srt` -> `movie.en.sdh.srt` (deaf and hard of hearing)
 - `4_English.srt` -> `movie.en.4.srt` (_unknown_ track number preserved in filename)
 
 Track numbers above 3 are considered _unknown_. _Unknown_ track numbers are generally perserved in the filenames for the user's convenience. **Exception:** If only one suitable subs file is found, it is assumed to be track 2 if it has an _unknown_ track number. A subs file without a track number is also assumed to be track 2.
