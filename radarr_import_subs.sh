@@ -126,7 +126,7 @@ for rel_sub_dir in "${SUB_DIRS[@]}"; do
       while read -r -d '' sub_file; do
         dlog "Current subtitle: ${sub_file}"
         sub_ext="${sub_file##*.}"
-        if [[ "$sub_file" =~ ([0-9]) ]]; then
+        if [[ "$sub_file" =~ ([0-9]+) ]]; then
           # sub filename contains a track number
           sub_track_num="${BASH_REMATCH[1]}"
           # if there's only one sub file but it has a funny track number, just assume it's a normal sub (track 2)
